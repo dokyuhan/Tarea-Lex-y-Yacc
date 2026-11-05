@@ -3,5 +3,8 @@
 .AppleDouble
 .LSOverride
 
-# github files
-.git/
+# Build artifacts
+src/lex.yy.c
+src/y.tab.c
+src/y.tab.h
+src/music

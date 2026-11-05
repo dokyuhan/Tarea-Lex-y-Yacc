@@ -9,7 +9,7 @@ RUN apt-get update && \
     libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /src
 
 CMD ["bash"]
 

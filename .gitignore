@@ -6,3 +6,5 @@
 # Editor files
 .vscode/
 .idea/
+__pycache__/
+.git/

@@ -1,0 +1,6 @@
+tempo = 120
+time = 4/4
+clef = treble
+
+|: mf C4/4 E4/4 G4/4 C5/4 |
+   C5/2. ~ C5/4 | R4 :|

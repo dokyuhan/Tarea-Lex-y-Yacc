@@ -11,5 +11,6 @@ RUN apt-get update && \
 
 WORKDIR /src
 
-CMD ["bash"]
+COPY . /src/
 
+CMD ["bash"]

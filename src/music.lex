@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "y.tab.h"
 
 int column = 1;
@@ -23,34 +24,62 @@ ESPACIO       [ \t\r]
 \n                      { column = 1; return '\n'; }
 {ESPACIO}+              { /* Descartar espacios */ }
 
-"tempo"|"TEMPO"         { printf("-> TOKEN_TEMPO: %s\n", yytext); return TOKEN_TEMPO; }
-"time"|"TIME"           { printf("-> TOKEN_TIME_SIG: %s\n", yytext); return TOKEN_TIME_SIG; }
-"clef"|"CLEF"           { printf("-> TOKEN_CLEF: %s\n", yytext); return TOKEN_CLEF; }
+"tempo"|"TEMPO"         { return TOKEN_TEMPO; }
+"time"|"TIME"           { return TOKEN_TIME_SIG; }
+"clef"|"CLEF"           { return TOKEN_CLEF; }
 
 "ppp"|"pp"|"p"|"mp"|"mf"|"f"|"ff"|"fff" { 
-                          printf("-> TOKEN_DINAMICA: %s\n", yytext); 
+                          strncpy(yylval.sval, yytext, sizeof(yylval.sval) - 1);
+                          yylval.sval[sizeof(yylval.sval) - 1] = '\0';
                           return TOKEN_DINAMICA; 
                         }
 
-"|:"|":|"|"||"|"|"     { printf("-> TOKEN_BARRA: %s\n", yytext); return TOKEN_BARRA; }
-"="                     { printf("-> TOKEN_ASIGN: %s\n", yytext); return TOKEN_ASIGN; }
-"."                     { printf("-> TOKEN_PUNTILLO: %s\n", yytext); return TOKEN_PUNTILLO; }
-"~"                     { printf("-> TOKEN_LIGADURA: %s\n", yytext); return TOKEN_LIGADURA; }
+"|:"|":|"|"||"|"|"     { 
+                          strncpy(yylval.sval, yytext, sizeof(yylval.sval) - 1);
+                          yylval.sval[sizeof(yylval.sval) - 1] = '\0';
+                          return TOKEN_BARRA; 
+                        }
+"="                     { return TOKEN_ASIGN; }
+"."                     { return TOKEN_PUNTILLO; }
+"~"                     { return TOKEN_LIGADURA; }
 
 {LETRA_NOTA}{ALTERACION}?{OCTAVA} { 
-                          printf("-> TOKEN_NOTA: %s\n", yytext); 
+                          strncpy(yylval.sval, yytext, sizeof(yylval.sval) - 1);
+                          yylval.sval[sizeof(yylval.sval) - 1] = '\0';
                           return TOKEN_NOTA; 
                         }
-"R"{OCTAVA}?            { printf("-> TOKEN_SILENCIO: %s\n", yytext); return TOKEN_SILENCIO; }
 
-{DIGITO}+\/{DIGITO}+    { printf("-> TOKEN_METRICA: %s\n", yytext); return TOKEN_METRICA; }
-\/(2|4|8|16|32|64)      { printf("-> TOKEN_DURACION: %s\n", yytext); return TOKEN_DURACION; }
+"R"([0-9]+)?            { 
+                          strncpy(yylval.sval, yytext, sizeof(yylval.sval) - 1);
+                          yylval.sval[sizeof(yylval.sval) - 1] = '\0';
+                          return TOKEN_SILENCIO; 
+                        }
 
-{DIGITO}+               { printf("-> TOKEN_NUMERO: %s\n", yytext); return TOKEN_NUMERO; }
-[a-zA-Z_][a-zA-Z0-9_]* { printf("-> TOKEN_ID: %s\n", yytext); return TOKEN_ID; }
+{DIGITO}+\/{DIGITO}+    { 
+                          strncpy(yylval.sval, yytext, sizeof(yylval.sval) - 1);
+                          yylval.sval[sizeof(yylval.sval) - 1] = '\0';
+                          return TOKEN_METRICA; 
+                        }
+
+\/(1|2|4|8|16|32|64)     { 
+                          int den = atoi(yytext + 1);
+                          yylval.dval = (den > 0) ? (4.0 / (double)den) : 1.0;
+                          return TOKEN_DURACION; 
+                        }
+
+{DIGITO}+               { 
+                          yylval.ival = atoi(yytext); 
+                          return TOKEN_NUMERO; 
+                        }
+
+[a-zA-Z_][a-zA-Z0-9_]* { 
+                          strncpy(yylval.sval, yytext, sizeof(yylval.sval) - 1);
+                          yylval.sval[sizeof(yylval.sval) - 1] = '\0';
+                          return TOKEN_ID; 
+                        }
 
 . {
-    fprintf(stderr, "[Error Lexico] Caracter '%s' no reconocido en L:%d C:%d\n", 
+    fprintf(stderr, "[Error Léxico] Carácter '%s' no reconocido en L:%d C:%d\n", 
             yytext, yylineno, column - (int)yyleng);
 }
 

@@ -3,8 +3,5 @@
 .AppleDouble
 .LSOverride
 
-# Editor files
-.vscode/
-.idea/
-__pycache__/
+# github files
 .git/

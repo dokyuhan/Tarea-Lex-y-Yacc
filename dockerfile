@@ -11,6 +11,10 @@ RUN apt-get update && \
 
 WORKDIR /src
 
-COPY . /src/
+COPY src/ /src/
+# corre en cunado se compila el contenedor para tener listo el ejecutable llamandolo "music"
+RUN bison -y -d music.yacc && \
+    flex music.lex && \
+    gcc y.tab.c lex.yy.c -o music -lfl
 
 CMD ["bash"]

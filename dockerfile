@@ -1,20 +1,15 @@
-FROM python:3.12-slim
+FROM gcc:latest
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    flex \
-    bison \
-    gcc \
-    make \
-    libc6-dev \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends flex bison && \
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /src
+WORKDIR /app
 
-COPY src/ /src/
-# corre en cunado se compila el contenedor para tener listo el ejecutable llamandolo "music"
+COPY src/ /app/
+
 RUN bison -y -d music.yacc && \
     flex music.lex && \
-    gcc y.tab.c lex.yy.c -o music -lfl
+    gcc y.tab.c lex.yy.c -o music
 
-CMD ["bash"]
+CMD ["./music", "test.txt"]
